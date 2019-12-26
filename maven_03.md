@@ -77,3 +77,55 @@ Isto indica que não basta mencionarmos o uso do plugin; devemos indicar que ele
   </build>
   <!-- ... -->
 </project>
+
+# Plugin de cobertura de testes
+
+Instalar o plugin jacoco
+é possível verificar os goals (opções) para execução do plugin
+não é bom deixar a versão de um plugin em aberto pq o maven sempre busca a mais recente
+
+mvn jacoco:help
+
+vou rodar duas fases: prepare-agent e report
+se não falar a fase, ele executa padrão
+<executions>
+
+<plugin>
+  <groupId>org.jacoco</groupId>
+  <artifactId>jacoco-maven-plugin</artifactId>
+  <version>0.7.5.201505241946</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>prepare-agent</goal>
+                <goal>report</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+
+relatório vai pra target
+
+# Atualizando dependências do projeto
+
+exibe as dependências com novas versões mas sem atualizar
+mvn versions:display-dependency-updates
+
+atualiza
+mvn versions:use-latest-versions
+
+ambos fazem parte do plugin versions
+
+# Teste unitários
+
+Para cada método, só criar:
+
+@Test
+public void metodoTest(){
+
+}
+
+executa o comando mvn verify
+
+Run As > Maven Build
+Goals > verify

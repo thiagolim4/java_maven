@@ -1,126 +1,104 @@
 # Maven 01
 
-Simpliifcação de build de projeto
-Maven - ferramenta de automatização de build
-Processo manual de Projeto:
+## O que é o Maven
+- Ferramenta de automatização de build (construção) de projeto
+- Organiza o projeto, separando código executável de entregável (cliente), além de separar os testes, recursos, etc
 
+## Processo de Build sem Maven
+- Exemplo de processo manual de build de projeto:
+
+```java
 public class Calculadora{
   public static void main(String[] args){
       System.out.println("5 mais 5 é "+ (5+5));
   }
 }
+```
 
-Para compilar:
-
+### Compilar
+- Projeto com um arquivo:
+```
 javac Calculadora.java
+```
+- Se tiver mais arquivos:
+```
+javac arquivo1 arquivo2 arquivo3
+```
+- Depois de compilado, o Java gera o arquivo .class no mesmo local, sem separação de código fonte (source/src, .java) do build (.class)
 
-Se tiver cinco arquivos: javac arquivo1 arquivo2 arquivo3
-
-Depois de compilado, o java gera o arquivo .class no mesmo local
-Separar fonte (source/src, .java) do build (.class)
-
-Criar diretório onde joga os arquivos que gera, os .class e etc
-Vai cair no diretório target
-
+### Compilar e separar
+- O melhor seria criar um diretório para ter onde jogar os arquivos gerados (.class) e etc.
+- Compilar do diretório fonte (src) para o diretório alvo (target) a classe Calculadora.java:
+```
 javac -sourcepath src -d target src/Calculadora.java
-Compile do diretorio fonte src para o diretorio target o arquivo .java
+```
+- Para usar alguma biblioteca no projeto, deve-se baixar o .jar correspondente e adicionar no src do mesmo (ou lib)
 
-Pra usar alguma biblioteca: baixar o .jar
-Add a biblioteca no src, mas pode add ela na pasta lib
+### Compilar e separar com biblioteca
+- Compilar o projeto com todas as adições, usando a biblioteca no classpath (cp):
+```
+javac -sourcepath src -d target -cp lib/xstream-1.4.8.jar src/Calculadora.java
+```
+- Problemas: não faz verificação de biblioteca, versão, etc
+- Se tivesse arquivos de teste: teria que separar no diretório target, além das separações de target/classes, target/test, e outros diretórios em src/main, src/main/Calculadora.java
 
-E agora, como compilar o projeto com tudo isso?
-javac -sourcepath src -d target -cp lib/xstream-1.4.8.jar
- src/Calculadora.java
- e quero usar um biblioteca no meu classpath (cp)
- não faz verificação da biblioteca, versão, etc
-
- E se tivesse arquivos de teste?
- Teria que separar no diretorio target, target/classes, src/main, src/main/Calculadora.java
-
-maven.apache.org
-
-- tar.gz
-baixa, descompacta, mas usa pelo terminal
-
-cd bin
-ls
-./ pra exectar um script dentro do diretorio
+## Baixando Maven
+- Site do maven.apache.org
+- Download tar.gz
+ - Baixa, descompacta, executa pelo terminal
+ - Dentro de /bin
+```
 ./mvn --help
+```
 
-pra facilitar o trampo de ter que ficar entrando no diretorio, add isso no seu path
-
-pwd diretorio (caminho do bin)
-volta pro diretorio original
-cd
-pwd
-vi .bash_profile (vai alterar esse arquivo)
-export PATH=$PATH:diretorio
-o path é o path atual + diretorio
-salva o bash profile no dir do usuario
-abre um novo terminal
-
-Criar projeto novo com maven:
+## Criar Projeto Novo com Maven:
+- Novo projeto usando archetype:
+```
 mvn generate archetype:generate -DartifactId=produtos -DgroupId=br.com.empresa.maven -DinteractiveMode=false -DarchetypeArtifactId=maven-archetype-quickstart
-artifactid é o seu projeto/nome
-o penultimo parametro é tudo default
-ultimo é o projeto de exemplo
+```
+- ArtifactId é o seu projeto/nome (identificação, geralmente igual ao nome)
+- archetypeArtifcactId: projeto que vai usar como arquétipo/exemplo para construção, em geral usa-se o quickstart (iniciante, com configurações básicas)
 
+- Primeira execução do projeto no terminal, Maven baixa todos os plugins necessários e manda os arquivos .class para o diretório target
+```
 mvn compile
-Primeira vez que vai executar, vai baixar todos os plugins necessários para compilar e manda o arq .class pro target
-
+```
+- Executa para fim de teste (baixa JUnit)
+```
 mvn test
-Roda primeira vez pra testar (baixa o JUnit)
+```
+- Dentro de target, há uma pasta chamada surefire-reports, que abriga arquivos TXT em que o resultado do teste em cada classe é exibido
+- **pom.xml**: arquivo que contém o modelo do projeto, configurando sua versão, grupo do projeto, nome do projeto (artifact), nome, site (url), dependências e plugins.
 
-Dentro de target, há uma pasta chamada surefire-reports, que abriga arquivos TXT em que o resultado do teste em cada classe é exibido
-
-pom: modelo do projeto, configurando sua versão, grupo do projeto, nome do projeto (artifact), nome bonito é produtos, pode colocar site do projeto (url), e tem as dependências
-
-se o jar é só pra test, usa scope 'test'
-
-mvn clean: limpa o Projeto
-
-Gerando relatorios
-
-mvn clean lima o codigo de saida, deixando somente os de fonte
-remove o target
-
-usa esse plugin
+## Gerando relatórios
+- Limpa o projeto, limpa o código de saída deixando somente os de fonte removendo tudo do target:
+```
+mvn clean
+```
+- Plugin Surefire-Report, gera target/site com relatório em html:
+```
 mvn surefire-report:report
-gera target/site com o relatorio em html
-
-Como faço para o maven empacotar a main?
+```
+- Para empacotar a main em .jar, deixando no target (à medidade que a version muda ele também muda):
+```
 mvn package
-empacota pro target, à medida que muda a version ele muda
-
+```
+- Executar o package:
+```
 java -cp produtos-1.0-SNAPSHOT.jar br.com.empresa.maven.App
-e ele roda
+```
 
-Instalação do Maven no Linux
+## Instalação
+- Instalação do Maven no Linux (link)
+- Instalação do Maven no Windows (link)
 
-O primeiro passo é realizar o download do arquivo que contém os binários do Maven. Você poderá baixar o arquivo tar.gz, na opção "Binary tar.gz archive".
-
-Após o download, descompacte o tar.gz no diretório de sua preferência. Vamos adicionar o diretório bin, que se encontra no diretório do Maven, na variável de ambiente PATH para que seja possível acessar o executável mvn independente de qual seja o nosso diretório atual no terminal.
-
-Para alterar o valor da variável PATH, no Linux, em geral, editamos o arquivo .bashrc, localizado no diretório do seu usuário. É provável que já exista conteúdo nesse arquivo, portanto adicione o conteúdo no final do arquivo.
-
-No Mac OS o arquivo a ser editado é o .bash_profile, também localizado no diretório do seu usuário. Caso o arquivo não exista, você pode criá-lo. O conteúdo que deve ser inserido nos arquivos é o seguinte:
-
-export PATH=$PATH:/home/lucas/Dev/apache-maven-3.3.9/bin
-Observação: Lembre-se de alterar o diretório para o diretório onde se encontra o seu diretório do Maven.
-
-Para que as novas configurações sejam carregadas, abra um novo terminal.
-
-Teste se tudo ocorreu como esperado, utilize o comando mvn -v, que deve retornar informações sobre o Maven, o JDK, e o sistema operacional.
-
-Instalação do Maven no Windows
-
-Comandos para criar projeto maven
-
-Executar
+## Resumo
+- Criando projeto:
+```
 mvn compile
-mvn test (roda testes pra target)
-mvn clean (limpa o target)
-
-o comando test gera dois diretorios dentro do target:
-test-classes (que contem os .class)
-surefire-reports (resultado da execuçao dos testes)
+mvn test
+mvn clean
+```
+- Comando test gera dois diretórios dentro do target:
+ - test-classes (que contem os .class)
+ - surefire-reports (resultado da execuçao dos testes)
