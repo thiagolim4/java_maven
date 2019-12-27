@@ -100,8 +100,8 @@ mvn jacoco:help
                 <goal>report</goal>
             </goals>
         </execution>
+    </executions>
 </plugin>
-</executions>
 ```
 - Relatório vai pra target
 
