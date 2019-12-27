@@ -1,48 +1,45 @@
 # Ciclo de Vida do Maven
 
-Na documentação do Maven encontraremos as fases que um ciclo de vida build apresenta:
+- O processo de construção do projeto passa pelo chamado *Ciclo de Vida*, que possui as fases:
 
-1. Validação: verificamos se projeto possui todas as informações necessárias
+1. **Validação:** verificamos se projeto possui todas as informações necessárias
 
-2. Compilação: compilar os conteúdos
+2. **Compilação:** compilar os conteúdos
 
-3. Teste: realizar testes diferentes no projeto
+3. **Teste:** realizar testes diferentes no projeto
 
-4. Pacote: geração de um pacote do projeto
+4. **Pacote:** geração de um pacote do projeto
 
-5. Teste de integração: realizar testes de integração
+5. **Teste de integração:** realizar testes de integração
 
-6. Verificação: checagem do pacote gerado
+6. **Verificação:** checagem do pacote gerado
 
-7. Instalação: realizar a instalação do pacote no repositório local
+7. **Instalação:** realizar a instalação do pacote no repositório local
 
-8. Implantação: realizar a implantação no ambiente adequado
+8. **Implantação:** realizar a implantação no ambiente adequado
 
-Podemos forçar a ordem de etapas com opções da linha de comando, como não gerar testes, por meio do comando -DskipTests=true:
-
+- Cada fase posterior executa todas as anteriores
+- Podemos forçar a ordem de etapas com opções da linha de comando, como não gerar testes, por meio do comando:
+```
 mvn -DskipTests=true package
+```
 
-# Incluindo plugins
+## Incluindo plugins
 
-maven pmd: analisa o codigo fonte e detecta possiveis margens de bug no codigo
+- **maven pmd**: analisa o código fonte e detecta possíveis margens de bug no código
+- Executa o plugin, baixando as dependências necessárias e executando o relatório:
+```
 mvn pmd:pmd
-Procura na internet pra baixar junto com as dependencias e executa o relatorio
-
-Como o relatório PMD segue o padrão do Maven, o .jar desse plugin é encontrado automaticamente, ou seja, não precisamos efetivar nenhum tipo de configuração, já que o download dos conteúdos é realizado sem problemas. Ao final, será gerado um arquivo pmd.html, armazenado no diretório "produtos > target > site". Vejamos o conteúdo do relatório:
-
-no site do Apache tem usos do pmd e como analisar códigos de JavaScript, etc
-
-Com o comando pmd:pmd conseguimos gerar relatórios, mas de que forma verificamos a qualidade do nosso projeto? Lembrando que a verificação é uma fase do ciclo de vida do build.
-
-Se simplesmente utilizarmos o comando mvn verify no terminal, não teremos uma verificação efetiva, afinal não configuramos o PMD para ser utilizado no momento da verificação. Para isso, utilizaremos o comando pmd:check, que realiza uma varredura no build à procura de erros, inclusive interrompendo o projeto caso as regras definidas para o código não sejam cumpridas.
-
-Ao executarmos pmd:check, receberemos uma mensagem de erro no terminal (BUILD FAILURE), e a alegação é de que temos uma violação (You have 1 PMD violation). Estamos utilizando o PMD padrão, que possui diversas regras. Para customizá-lo precisamos ir ao Rules Set e aplicar nossas preferências.
-
-Temos uma questão: todas as vezes em que quisermos executar o PMD precisamos utilizar pmd:check no terminal, o que pode se tornar cansativo ao longo do desenvolvimento do programa. No arquivo pom.xml, podemos realizar configurações que permitam a execução automática do PDM durante o build do projeto. Começaremos criando a tag <build>, em que adicionaremos <plugins>.
-
+```
+- Será gerado um arquivo pmd.html, armazenado no diretório "> target > site"
+- Comando realiza uma varredura no build à procura de erros, inclusive interrompendo o projeto caso as regras definidas para o código não sejam cumpridas:
+```
+mvn pmd:check
+```
+- Para não ter que executar várias vezes o comando, pode-se realizar configurações que permitam a execução automática do PMD durante o build do projeto:
+```xml
 <build>
-    <plugins>
-    <plugins>
+  <plugins>
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-pmd-plugin</artifactId>
@@ -51,11 +48,14 @@ Temos uma questão: todas as vezes em que quisermos executar o PMD precisamos ut
   </plugins>
     </plugins>
 </build>
-
-No terminal, executaremos o comando mvn verify. Embora tenhamos um erro propositalmente colocado em nosso projeto, a verificação não consegue detectá-lo. Isso porque o PMD não é executado.
-
-Isto indica que não basta mencionarmos o uso do plugin; devemos indicar que ele alterará o ciclo de vida do projeto. No arquivo pom.xml, adicionaremos a tag <executions> para especificarmos quando o plugin deverá ser executado, afinal podem haver múltiplas execuções ao longo do build. Em nosso caso, será apenas uma execução na fase (<phase>) de verificação (verify), cujo objetivo (<goals>) é check.
-
+```
+- No terminal:
+```
+mvn verify
+```
+- Além de mencionar o plugin, deve-se indicar que ele alterará o clico de vida do projeto, adicionando a tag <executions> para indicar quando o plugin deverá ser executado
+- No caso, uma execução na fase de verificação, cujo objetivo (goals/opção) é check:
+```xml
 <project>
   <!-- ... -->
   <build>
@@ -77,19 +77,18 @@ Isto indica que não basta mencionarmos o uso do plugin; devemos indicar que ele
   </build>
   <!-- ... -->
 </project>
+```
+## Plugin de cobertura de testes
 
-# Plugin de cobertura de testes
-
-Instalar o plugin jacoco
-é possível verificar os goals (opções) para execução do plugin
-não é bom deixar a versão de um plugin em aberto pq o maven sempre busca a mais recente
-
+- Instalar o plugin jacoco
+- É possível verificar os goals (opções) para execução do plugin
+- Não é bom deixar a versão de um plugin em aberto pois o Maven sempre busca a mais recente (e se ficar em aberto isso vai sendo sempre modificando, podendo causar problemas no projeto)
+```
 mvn jacoco:help
-
-vou rodar duas fases: prepare-agent e report
-se não falar a fase, ele executa padrão
+```
+- Rodar duas fases: prepare-agent e report
+```xml
 <executions>
-
 <plugin>
   <groupId>org.jacoco</groupId>
   <artifactId>jacoco-maven-plugin</artifactId>
@@ -101,31 +100,34 @@ se não falar a fase, ele executa padrão
                 <goal>report</goal>
             </goals>
         </execution>
-    </executions>
 </plugin>
+</executions>
+```
+- Relatório vai pra target
 
-relatório vai pra target
-
-# Atualizando dependências do projeto
-
-exibe as dependências com novas versões mas sem atualizar
+## Atualizando dependências do projeto
+- Exibe as dependências com novas versões mas sem atualizar:
+```
 mvn versions:display-dependency-updates
-
-atualiza
+```
+- Atualiza com novas versões:
+```
 mvn versions:use-latest-versions
+```
+- Ambos fazem parte do plugin Versions
 
-ambos fazem parte do plugin versions
-
-# Teste unitários
-
-Para cada método, só criar:
-
+## Testes unitários
+- Para cada método, só criar:
+```java
 @Test
 public void metodoTest(){
-
+  //...
 }
-
-executa o comando mvn verify
-
-Run As > Maven Build
-Goals > verify
+```
+- É possível rodar direto pelo Eclipse:
+ - Run As > Maven Build
+ - Goals > Verify
+- Ou:
+```
+mvn verifiy
+```

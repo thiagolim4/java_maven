@@ -1,4 +1,6 @@
 # Maven 01
+- Por que usar Maven
+- Primeiros comandos no Maven
 
 ## O que é o Maven
 - Ferramenta de automatização de build (construção) de projeto
